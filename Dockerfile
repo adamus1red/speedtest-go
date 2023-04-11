@@ -4,10 +4,12 @@ WORKDIR /build
 COPY go.mod go.sum ./
 RUN go mod download
 COPY ./ ./
-RUN go build -ldflags "-w -s" -trimpath -o speedtest .
+RUN CGO_ENABLED=0 go build -ldflags "-w -s" -trimpath -o speedtest .
 
-FROM alpine:3.16
-RUN apk add --no-cache ca-certificates
+#FROM alpine:3.16
+#RUN apk add --no-cache ca-certificates
+#WORKDIR /app
+FROM cgr.dev/chainguard/static:latest
 WORKDIR /app
 COPY --from=build_base /build/speedtest ./
 COPY settings.toml ./
